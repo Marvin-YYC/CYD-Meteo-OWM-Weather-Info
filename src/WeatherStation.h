@@ -27,10 +27,10 @@ TFT_eSprite sprite = TFT_eSprite(&tft);
 WiFiManager wifiManager;
 String staHostname = "CYD Weather Station";      // Access Point hostname.
 // >>>>> [CHANGE THIS] - Custom Static address for the Weather Station
-char static_ip[16] = "10.0.0.10"; // "10.0.0.10";
-char static_gw[16] = "10.0.0.1"; //
+char static_ip[16] = "00.0.0.00"; //
+char static_gw[16] = "00.0.0.00"; //
 char static_mask[16] = "255.255.255.0"; //
-char static_dns[16] = "10.0.0.1";  //
+char static_dns[16] = "00.0.0.0";  //
 
 // >>>> [CHANGE THIS] - TimeZone/Town/Latitude/longitude
 
