@@ -12,11 +12,10 @@ Sunrise/Set time, length of day in Hrs+Min
 # Weather Data
 Condtions, Current temperature in °C, Hi/Lo temp in °C, Wind chill/Feel Like temp in °C colour changes depending on conditions as per ECC standard, Relative Humidity
 Wind speed and Wind gust speed in kph, colour changes depending on conditions.  Wind direction compass points. 
-Dewpoint in °C, Cloud cover in %, Visibiity in km, Possibility of Percipitation in %, over 70% text goes yellow. 
-UV index in coloured warnings as per international standard, green = low / Purple = Extreme. 
+Dewpoint in °C, Cloud cover in %, Visibiity in km, Possibility of Percipitation in %, over 75% text goes greenyellow. 
+UV index in coloured warnings as per international standard, green = low 1-3 / Purple = Extreme 11+. 
 
-
-Local Aurora Borealis data from https://www.aurorawatch.ca from Alberta,Canada.
+Local Aurora Borealis data from https://www.aurorawatch.ca from University of Alberta,Canada.
 Probability of auroral displays occurring in % above 50% text goes yellow above 70% red.
 
 
