@@ -20,7 +20,7 @@ https://github.com/marcosjl31/WeatherStation
 - Dewpoint in °C - Cloud cover in % - Visibiity in km
 - Possibility of Precipitation in %, over 75% text goes greenyellow
 - UV index in coloured warnings as per international standard, green = low 1-3 / Purple = Extreme 11+.
-- Local Aurora Borealis data thanks to University of Alberta, Canada.  https://www.aurorawatch.ca  Probability of auroral displays occurring in % above 50% text goes yellow above 70% red.  Website data is updated hourly.
+- Local Aurora Borealis data thanks to University of Alberta, Canada.  https://www.aurorawatch.ca  Probability of auroral displays occurring (PoAB) in % above 50% text goes yellow above 70% red.  Website data is updated hourly.
 
 ![signal-2025-02-10-110216_002](https://github.com/user-attachments/assets/9a12e640-1086-4056-9009-626a194f2bd7)
 ![signal-2025-01-28-112736_002](https://github.com/user-attachments/assets/a062e056-a35f-4237-b371-10a3463e1ece)
