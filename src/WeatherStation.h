@@ -15,6 +15,7 @@
 #include "ArialRounded26.h"
 #include "ArialRounded44.h"
 #include "ArialRounded54.h"
+#include "WeatherFont60.h"
 #include "weatherIcons.h"
 
 #define VW_Version "v. 1.00"
@@ -27,10 +28,10 @@ TFT_eSprite sprite = TFT_eSprite(&tft);
 WiFiManager wifiManager;
 String staHostname = "CYD Weather Station";      // Access Point hostname.
 // >>>>> [CHANGE THIS] - Custom Static address for the Weather Station
-char static_ip[16] = "00.0.0.00"; //
-char static_gw[16] = "00.0.0.00"; //
+char static_ip[16] = "10.0.0.10"; // "10.0.0.10";
+char static_gw[16] = "10.0.0.1"; //
 char static_mask[16] = "255.255.255.0"; //
-char static_dns[16] = "00.0.0.0";  //
+char static_dns[16] = "10.0.0.1";  //
 
 // >>>> [CHANGE THIS] - TimeZone/Town/Latitude/longitude
 
@@ -45,22 +46,27 @@ const String townLon = "-106.0889";
 49.63    -112.791   Lethbridge YQL
 53.308   -113.5845  Edmonton YEG
 */
-/*
-const String timeZone = "America/Edmonton";
-const String townName = "Edmonton YEG";
-const String townLat = "53.308";
-const String townLon = "-113.5845";
-*/
 
-const String timeZone = "America/Edmonton";
-const String townName = "Calgary CYYC";
-const String townLat = "51.1293";
-const String townLon = "-114.0129"; 
+//const String timeZone = "America/Edmonton";
+//const String townName = "OLD CROW";
+//const String townLat = "67.5706";
+//const String townLon = "-139.8392";
+
+
+
+const String timeZone = "America/Edmonton";  
+const String townName = "Calgary, AB";
+const String townLat = "51.1293";  // use the yyc coord, corrects the length of day
+const String townLon = "-114.0129";
 
 WebServer server(80);
 
 // API Web server for accurate time getTime.
 String timeServer = "https://timeapi.io/api/time/current/zone?timeZone=" + timeZone;
+
+
+//  Web server URL for getAuroraData.
+//String auroraServer = "https://www.aurorawatch.ca/AWVal.txt";
 
 ///////><><String weatherServer = "https://api.open-meteo.com/v1/forecast?latitude=" + townLat + "&longitude=" + townLon + "&current=weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,wind_direction_10m,&forecast_days=1";
 
@@ -96,7 +102,8 @@ struct DateTime {
 
 // forward declarations
 bool drawTime(void *);
-void drawForecast(int wmo, float currTemp,  short currHumi, float minTemp, float maxTemp, float currWind, float feelTemp, float gustWind, short cldTotal, float visib, float uv_index_max, float wndDir, float dayLength, float dewPo, short sunRise, short sunSet, short cldLow, short cldMid, short cldHi, String timZon, short rainProba);
+void drawForecast(int wmo, float currTemp,  short currHumi, float minTemp, float maxTemp, float currWind, float feelTemp, float gustWind, short cldTotal, float visib, float uvIndex, float wndDir, float dewPo, int sunriseHour, int sunriseMin,int sunsetHour,int sunsetMin,int daylightHours, int daylightMinutes, short cldLow, short cldMid, short cldHi, short rainProba);
+
 const uint16_t* getIconFromWMO(int wmo);
 String getDescriptionFromWMO(int wmo);
 bool getTime(void *);
