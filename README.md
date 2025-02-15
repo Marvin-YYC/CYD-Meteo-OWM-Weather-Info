@@ -4,6 +4,9 @@ CYD (Cheap Yellow Display) Meteo Weather Information Aggregator
 Original code and assistance from  https://github.com/marcosjl31 with many thanks
 https://github.com/marcosjl31/WeatherStation
 
+This is a work in progress, I'm still working on it and any help or suggestions will be greatly appreciated.  
+I am not using the weather icons in my code, as it was too large for my application, but I left them in the sketch incase I figure out how to use them, or if someone else wants to use them.  I have also added a weather icon font for future use.  The weather icon in the top right corner is just for show at the moment.  I am also hoping to add some AQHI data once I figure that out.  :)
+
 ## Details
 - USB Powered
 - Deep sleep mode - ESP deep sleep mode shuts off processor and screen at night.
