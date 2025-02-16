@@ -4,11 +4,14 @@
 
 bool getAuroraData(void*);  
 void drawAurora(float auroraValue); 
+bool getaqiData(void*);
+void drawAQI(int aqiValue);
 
 #define TFT_BL 21
 #define BACKLIGHT_PIN 21
 
 const char* auroraURL = "https://www.aurorawatch.ca/AWVal.txt";
+const char* aqicnURL = "https://api.waqi.info/feed/"yourlocationinformationorstationID"/?token=YOUR_API_KEY";  // PROVIDE YOUR API TOKEN AND LOCATIONINFORMATION HERE
 
 //--- Time object
 auto timer = timer_create_default();
@@ -16,7 +19,8 @@ auto timer = timer_create_default();
 void setup() {
   Serial.begin(115200);
   Serial.begin(115200);
-  bool getAuroraData(void*);  // Works fine now
+  bool getAuroraData(void*); 
+  bool getgetaqiData(void*);
   while (!Serial) {}; 
   Serial.print("WeatherStation");
   Serial.println(VW_Version);
@@ -41,7 +45,6 @@ void setup() {
   }
 
   Serial.println("INFO: connected to WiFi");
-  //setupApi(); ////////////////////////////  WAS NEEDED FOR REMOTE SENSOR
   getTime(NULL);
 
   //--- Initialize display
@@ -54,20 +57,25 @@ void setup() {
   ledcWrite(BACKLIGHT_PIN, 50); 
   ledcSetup(0, 5000, 8); // Channel 0, 5kHz, 8-bit resolution
   ledcAttachPin(BACKLIGHT_PIN, 0);
-  ledcWrite(0, 128); // Adjust brightness (0-255) 128 adjust brightness level here<<< 70
+  ledcWrite(0, 130); // Adjust brightness (0-255) 128 adjust brightness level here<<< 80
 //////~~~~~~~~
 
   tft.fillScreen(WS_BLACK);
   drawTime(NULL);
   getForecast(NULL);
   bool getAuroraData(void*);
-  getAuroraData(nullptr);  //  fetch data once immediately on boot
+  getAuroraData(nullptr); 
+  bool getaqiData(void*);
+  getaqiData(nullptr);
+
 
   //--- Create Timers for main Weather Station functions
   timer.every(500,drawTime);               // Every 500ms, display time
   timer.every(30*60*1000,getTime);         // Every 30mn
   timer.every(20*60*1000,getForecast);     // Every 20min
   timer.every(20*60*1000,getAuroraData);   // Fetch aurora data every 20 minutes
+  timer.every(20*60*1000,getaqiData);      // Fetch AQI data every 20 minutes
+  //recommend that Forecast/Aurora/AQI updates occur at he same time or the sprites will be blank waiting for data.
 }
 
 void loop() {
@@ -108,7 +116,7 @@ bool getAuroraData(void *) {
       Serial.println("WiFi not connected, trying to reconnect...");
       WiFi.disconnect();
       WiFi.reconnect();
-      delay(500);
+      //delay(500);
       if (WiFi.status() != WL_CONNECTED) {
           Serial.println("Failed to reconnect.");
           return true;  // Keep the timer running
@@ -116,7 +124,6 @@ bool getAuroraData(void *) {
   }
 
   HTTPClient http;
-  http.setTimeout(500);  // Set timeout to avoid freezing
   http.begin(auroraURL);
 
   int httpResponseCode = http.GET();
@@ -161,12 +168,90 @@ void drawAurora(float auroraValue) {
         sprite.setTextColor(TFT_LIGHTGREY);
         }
   sprite.loadFont(arialround20); 
-  sprite.setCursor(0, 5);  // Use setCursor instead of setTextDatum
-  sprintf(tempo, "PoAB: %2d%%", (int)auroraValue);  // Convert float to int
-  sprite.print(tempo);  // Print text to sprite
-  sprite.pushSprite(0, 220);  // Push sprite to display position  ) 0 full left 220 bottom left.
+  sprite.setCursor(0, 0);  
+  sprintf(tempo, "PoAB: %2d%%", (int)auroraValue);  
+  sprite.pushSprite(0, 220); 
   //delay(500); 
-  sprite.deleteSprite();       // Free memory
+  sprite.deleteSprite();  
+}
+
+bool getaqiData(void *) {
+  Serial.println("Fetching AQI Data...");
+
+  if (WiFi.status() != WL_CONNECTED) {  
+      Serial.println("WiFi not connected, trying to reconnect...");
+      WiFi.disconnect();
+      WiFi.reconnect();
+      if (WiFi.status() != WL_CONNECTED) {
+          Serial.println("Failed to reconnect.");
+          return true;  // Keep the timer running
+      }
+  }
+  HTTPClient http;
+  http.begin(aqicnURL);
+
+  int httpResponseCode = http.GET();
+  Serial.print("HTTP Response Code: ");
+  Serial.println(httpResponseCode);
+
+  if (httpResponseCode > 0) {
+      String payload = http.getString();
+      Serial.println("AQI Data: " + payload);
+      Serial.print("Parsed AQI Data: ");
+      JsonDocument doc;
+            DeserializationError error = deserializeJson(doc, payload);
+            if (!error) {
+
+                int aqiValue = doc["data"]["aqi"]; // Extract AQI value
+                Serial.print("AQI: ");
+                Serial.println(aqiValue);
+                drawAQI(aqiValue);
+            } else {
+                Serial.println("Failed to parse JSON");
+            }
+        } else {
+            Serial.print("Error on HTTP request: ");
+            Serial.println(httpResponseCode);
+        }
+  http.end();
+  yield();  // Allow background tasks to run
+  return true;  // Keep the timer running
+}
+
+/**/
+void drawAQI(int aqiValue) {
+  char tempo[20];
+  Serial.println("Drawing AQI with Sprites...");
+  sprite.createSprite(200, 20);
+  sprite.fillSprite(WS_BLACK);
+
+      if (aqiValue <= 10) {
+        sprite.setTextColor(TFT_DARKGREEN);
+      } else if (aqiValue <= 30) {
+        sprite.setTextColor(TFT_GREEN);
+      } else if (aqiValue <= 50) {
+        sprite.setTextColor(TFT_GREENYELLOW);
+      } else if (aqiValue <= 100) {
+        sprite.setTextColor(TFT_YELLOW);
+      } else if (aqiValue <= 150) {
+        sprite.setTextColor(TFT_ORANGE);
+      } else if (aqiValue <= 200) {
+        sprite.setTextColor(TFT_RED);
+        sprite.fillSprite(TFT_YELLOW);
+      } else if (aqiValue <= 300) {
+        sprite.setTextColor(TFT_PURPLE);
+        sprite.fillSprite(TFT_YELLOW);
+      } else {
+        sprite.setTextColor(TFT_MAROON);
+        sprite.fillSprite(TFT_YELLOW);
+      }
+  sprite.loadFont(arialround20); 
+  sprite.setCursor(25, 3);  
+  sprintf(tempo, "%d :AQI", (int)aqiValue);  
+  sprite.print(tempo);  
+  sprite.pushSprite(220, 220);  
+  //delay(500); 
+  sprite.deleteSprite();       
 }
 
 bool getTime(void *) {
@@ -182,7 +267,7 @@ bool getTime(void *) {
   httpResponseCode = http.GET();
   if (httpResponseCode > 0){
     payload = http.getString();
-    Serial.println(httpResponseCode);      // for debug purpose
+    Serial.println(httpResponseCode); 
     Serial.println(payload);
   } else {
     Serial.print("ERROR: bad HTTP1 request: ");
@@ -195,7 +280,7 @@ bool getTime(void *) {
   if (!error) {
     datetime = jsonDoc["dateTime"];
     dt = parseISO8601(String(datetime));
-    rtc.setTime(dt.second, dt.minute, dt.hour, dt.day, dt.month, dt.year); //rtc.setTime(dt.second, dt.minute, dt.hour, dt.day, dt.month, dt.year);rtc.setTime(dt.second, dt.minute, dt.hour, dt.day, dt.month, dt.year);
+    rtc.setTime(dt.second, dt.minute, dt.hour, dt.day, dt.month, dt.year); 
   }
   return true;
 } 
@@ -229,7 +314,7 @@ bool getForecast(void *) {
   
   if (httpResponseCode > 0){
     payload = http.getString();
-    Serial.println(httpResponseCode);      // for debug purpose
+    Serial.println(httpResponseCode);  
     Serial.println(payload);
   } else{
     Serial.print("ERROR: bad HTTP1 request: ");
@@ -318,15 +403,15 @@ bool drawTime(void *) {
   int dw;
   char tempo[20];
 
-  sprite.createSprite(340,70); // 148,50 //sprite.createSprite(320,50);
-  sprite.fillSprite(WS_BLACK); //(WS_BLACK);
+  sprite.createSprite(340,70); 
+  sprite.fillSprite(WS_BLACK); 
   sprite.setTextColor(TFT_SKYBLUE);
   now = rtc.getTimeStruct();
   dw = rtc.getDayofWeek();
 
   sprite.loadFont(arialround20);
   sprite.setTextDatum(CL_DATUM);
-  sprintf(tempo,"%s %02d %s %4d",days[dw],now.tm_mday,months[now.tm_mon],(now.tm_year+1900)); // sprintf(tempo,"%s %02d %s %4d",days[dw],now.tm_mday,months[now.tm_mon],(now.tm_year+1900));
+  sprintf(tempo,"%s %02d %s %4d",days[dw],now.tm_mday,months[now.tm_mon],(now.tm_year+1900)); 
   sprite.drawString(tempo,10,10);
 
   //sprite.setTextColor(TFT_DARKGREY);
@@ -335,17 +420,17 @@ bool drawTime(void *) {
   //sprite.drawString(tempo,30,40);
 
   sprite.setTextColor(TFT_WHITE);
-  sprintf(tempo,"%02d:%02d",now.tm_hour,now.tm_min); // sprintf(tempo,"%02d:%02d:%02d",now.tm_hour,now.tm_min,now.tm_sec);
+  sprintf(tempo,"%02d:%02d",now.tm_hour,now.tm_min);
   sprite.loadFont(arialround54);
-  sprite.drawString(tempo,10,50); //~  5,40  moved this to the left // sprite.drawString(tempo,160,40);
-  sprintf(tempo,":%02d",now.tm_sec); //~ add seconds
-  sprite.loadFont(arialround20); //~ make seconds smaller font
-  sprite.drawString(tempo,155,35); //~ 102,30 moves seconds to the right of centre
+  sprite.drawString(tempo,10,50); 
+  sprintf(tempo,":%02d",now.tm_sec); 
+  sprite.loadFont(arialround20); 
+  sprite.drawString(tempo,155,35); 
 
   sprite.setTextColor(TFT_BLUE);
   sprite.loadFont(arialround14);
-  sprite.setTextDatum(CL_DATUM); //sprite.setTextDatum(TR_DATUM);
-  sprite.drawString(townName,220,8); //170,0    168,10
+  sprite.setTextDatum(CL_DATUM); 
+  sprite.drawString(townName,220,8);
 
   sprite.setTextColor(TFT_YELLOW);
   sprintf(tempo,"C"); //~ 
@@ -374,12 +459,12 @@ bool drawTime(void *) {
 
 void drawForecast(int wmo, float currTemp, short currHumi, float minTemp, float maxTemp, float currWind, float feelTemp, float gustWind, short cldTotal, float visib, float uvIndex, float wndDir,float dewPo, int sunriseHour, int sunriseMin,int sunsetHour,int sunsetMin,int daylightHours, int daylightMinutes, short cldLow, short cldMid, short cldHi, short rainProba) {
   char tempo[10];
-sprite.createSprite(320,170); // 148,50 //sprite.createSprite(320,50);
+sprite.createSprite(320,170); 
   sprite.fillSprite(WS_BLACK);
-  sprite.setTextColor(TFT_GREENYELLOW); 
-  sprite.loadFont(arialround20); //(arialround36);
+  sprite.setTextColor(TFT_SKYBLUE); 
+  sprite.loadFont(arialround20);
   sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(getDescriptionFromWMO(wmo),0,90); //   15,6    115,6   315,18
+  sprite.drawString(getDescriptionFromWMO(wmo),0,90); 
 
 ///>>>TEST AREA
       //sprite.setTextColor(TFT_DARKGREY);
@@ -388,7 +473,7 @@ sprite.createSprite(320,170); // 148,50 //sprite.createSprite(320,50);
 
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround20);
-  sprintf(tempo,"d:%dh % dm", daylightHours, daylightMinutes); 
+  sprintf(tempo,"d:%dh|%dm", daylightHours, daylightMinutes); 
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(tempo,320,30);
 
@@ -419,13 +504,13 @@ sprite.createSprite(320,170); // 148,50 //sprite.createSprite(320,50);
   sprite.loadFont(arialround44);
   sprintf(tempo,"%4.1f",currTemp);
   sprite.setTextDatum(BR_DATUM); //~~~
-  sprite.drawString(tempo,200,75); // 150,45    was 165,45 moved right make room for °C  //sprite.drawString(tempo,100,75); Changed to BR_DATUM as to keep justtifcation when only two digits.
+  sprite.drawString(tempo,200,75); 
 
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround14);
   sprintf(tempo,"°C"); // separated this from lines above to make °C smaller font
   sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(tempo,205,50); //  168,35 full right - middle of digit 165,45
+  sprite.drawString(tempo,205,50);
       
       if (feelTemp < -27.00) { 
           sprite.setTextColor(TFT_RED);
@@ -451,13 +536,13 @@ sprite.createSprite(320,170); // 148,50 //sprite.createSprite(320,50);
   sprite.loadFont(arialround14);
   sprintf(tempo,"°C"); // separated this from lines above to make °C smaller font
   sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(tempo,185,140); //  168,35 full right - middle of digit 165,45
+  sprite.drawString(tempo,185,140); 
 
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2d %%:Humi", currHumi);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo,320,90); //sprite.drawString(tempo,60,110);
+  sprite.drawString(tempo,320,90); 
 
       if (currWind > 55) {   // Check the higher threshold first
       sprite.setTextColor(TFT_RED);
@@ -554,16 +639,16 @@ sprite.loadFont(arialround20);
 sprite.drawString(tempo,280,150);
 sprite.setTextColor(TFT_LIGHTGREY);
 sprite.loadFont(arialround20);
-sprintf(tempo,":Dir");  //sprintf(tempo,"Dir: %4.1f", wndDir);
+sprintf(tempo,":Dir");  
 sprite.setTextDatum(BR_DATUM);
-sprite.drawString(tempo,320,150); // 170,130
-
+sprite.drawString(tempo,320,150); 
+/*
 sprite.setTextColor(TFT_LIGHTGREY);
 sprite.loadFont(arialround20);  
 sprintf(tempo,"%4.0f°c:Dew", dewPo);
 sprite.setTextDatum(BR_DATUM);
 sprite.drawString(tempo,320,170);  
-
+*/
 sprite.setTextColor(TFT_LIGHTGREY);
 sprite.loadFont(arialround20);  
 sprintf(tempo,"Cld: %2d %%", cldTotal);
@@ -619,12 +704,12 @@ sprite.drawString(tempo, 90, 130);
         sprintf(tempo,"Low");
 }
   //sprite.loadFont(arialround14);  
-  //sprintf(tempo,"[%2.0f]",uvIndex);//  This returns a number
-  sprite.drawString(tempo,65,150); // move the data over to make space for desc  //sprite.drawString(tempo,65,170); 
+  //sprintf(tempo,"[%2.0f]",uvIndex);
+  sprite.drawString(tempo,65,150); 
   sprite.setTextColor(TFT_LIGHTGREY); // 
-  sprintf(tempo,"UVdx:"); //sprintf(tempo,"UVdx: %4.0f", uvIndex);
+  sprintf(tempo,"UVdx:"); 
   sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(tempo,0,150);  //sprite.drawString(tempo,0,170);  
+  sprite.drawString(tempo,0,150); 
 
   //sprite.setTextColor(TFT_LIGHTGREY);
   //sprite.loadFont(arialround14);  
@@ -644,7 +729,7 @@ sprite.drawString(tempo, 90, 130);
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(tempo,320,55);
 
-  sprite.pushSprite(0,70);//150,50
+  sprite.pushSprite(0,70);
   sprite.deleteSprite();
 
   //>>
