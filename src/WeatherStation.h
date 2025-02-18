@@ -31,7 +31,7 @@ String staHostname = "CYD Weather Station";      // Access Point hostname.
 char static_ip[16] = "00.0.0.00"; //  Change these to suite your router
 char static_gw[16] = "00.0.0.0"; 
 char static_mask[16] = "255.255.255.0"; //
-char static_dns[16] = "10.0.0.1";  //
+char static_dns[16] = "00.0.0.1";  //
 ////////// Change this data
 const String timeZone = "America/Edmonton";  // Use time zone as per Meteo
 const String townName = "Calgary, AB"; // This is just a text line, use whatever description here that you like
