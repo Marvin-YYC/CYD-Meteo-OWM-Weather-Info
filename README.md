@@ -31,13 +31,14 @@ I believe it will run on other CYD's with some configuration  changes
 
 
 ![signal-2025-03-09-154124](https://github.com/user-attachments/assets/9ca6cc61-ab27-4811-96f1-fe3ff406c281)
+Yup, it's windy here today :)
 ![signal-2025-02-14-200904](https://github.com/user-attachments/assets/cbea3f9b-5333-438d-86f3-41a7fc57fca8)
 ![signal-2025-02-10-110216_002](https://github.com/user-attachments/assets/9a12e640-1086-4056-9009-626a194f2bd7)
 ![signal-2025-01-28-112736_002](https://github.com/user-attachments/assets/a062e056-a35f-4237-b371-10a3463e1ece)
-![signal-2025-02-04-144343_004](![signal-2025-03-09-154124](https://github.com/user-attachments/assets/5f9cc654-1630-4094-aa58-8a346550e4ce)
-https://github.com/user-attachments/assets/b4d51d56-6036-4f6c-97fc-86047ec1f44b)
+
 ![signal-2025-02-04-144343_002](https://github.com/user-attachments/assets/457ea7ab-623a-4fe4-96aa-cf23f1578aa7)
 ![CYD-2025-01-05-195444_002](https://github.com/user-attachments/assets/53f8c39c-2bd0-4377-be2f-cc53f758b670)
+Original code
 
 
 
