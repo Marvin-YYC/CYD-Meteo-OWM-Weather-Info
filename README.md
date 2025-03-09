@@ -15,11 +15,8 @@ I believe it will run on other CYD's with some configuration  changes
 - Weather Data from Open Weather Map - you will need your own API key
 - 24hr Clock with seconds
 - Sunrise/set time, length of day in hrs+min.
-- Condtions.
-- Current temperature in °C
-- Daily Hi/Lo temp in °C
+- Condtions - Current temperature in °C - Daily Hi/Lo temp in °C - Relative Humidity
 - Current Wind chill/Feel like temp in °C temp, colour changes depending on conditions as per ECC standard
-- Current Relative Humidity
 - Current Sustained Wind speed and Wind gust in km/h, colour changes if wind conditions are above normal (set parameters manually)
 - Current Wind direction compass/intercardinal points
 - Dewpoint in °C - Cloud cover in % - Visibility in km - CAPE J/kg
