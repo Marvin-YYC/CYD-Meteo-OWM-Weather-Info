@@ -29,7 +29,8 @@ I believe it will run on other CYD's with some configuration  changes
 - NEW Feb 16/25 - AQI data from https://aqicn.org - You will need to obtain your own free API token here> https://aqicn.org/data-platform/token/
 - NEW Mar 9/25 - Added Open Weather Map information in top right corner.  - you will need your own API key 
 
-![Uploading signal-2025-03-09-154124.jpeg…]()
+
+![signal-2025-03-09-154124](https://github.com/user-attachments/assets/9ca6cc61-ab27-4811-96f1-fe3ff406c281)
 ![signal-2025-02-14-200904](https://github.com/user-attachments/assets/cbea3f9b-5333-438d-86f3-41a7fc57fca8)
 ![signal-2025-02-10-110216_002](https://github.com/user-attachments/assets/9a12e640-1086-4056-9009-626a194f2bd7)
 ![signal-2025-01-28-112736_002](https://github.com/user-attachments/assets/a062e056-a35f-4237-b371-10a3463e1ece)
