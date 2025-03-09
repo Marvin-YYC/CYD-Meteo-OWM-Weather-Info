@@ -46,10 +46,10 @@ const String townLon = "-114.0129";
 //Open Weather Map info >>>>>>>>>>>>>>>PUT YOUR INFO BELOW <<<<<<<<<<<<<<
 const String owmTown = "Calgary";    // EDIT <<<<  your city/town/location name "CALGARY" "Dawson+Creek" (caps not important)
 const String owmCountry = "CA";     // EDIT <<<< your country code "CA"
-const String owmKey = "YOUR OWM API KEY HERE"; // EDIT <<<<<< Your OWM api key here
+const String owmKey = "YOUR_OWM_API_KEY_HERE"; // EDIT <<<<<< Your OWM api key here
 
 //World Air Quality Index project station ID and API key https://aqicn.org/  >>>>>>>>>>>>>>>PUT YOUR INFO BELOW <<<<<<<<<<<<<<
-const String waqiKey = "YOUR AQICN API KEY HERE"; // you own API key goes here
+const String waqiKey = "YOUR_AQICN_API_KEY_HERE"; // you own API key goes here
 const String waqiStn1 = "@12498";  // set AQI station 1
 const String waqiStn2 = "@5477";  // set AQI station 2
 //const String waqiStn3 = "stationid";  // set AQI station 3
