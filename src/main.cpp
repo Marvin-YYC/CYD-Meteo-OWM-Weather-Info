@@ -1045,7 +1045,7 @@ sprite.drawString(tempo, 85, 87);
       sprite.setTextColor(TFT_DARKGREY);
   }
   sprite.loadFont(arialround20);  
-  sprintf(tempo,"%4d:CAPE",cape);
+  sprintf(tempo,"%4d:CAPE",cape);  // Convective Available Potential Energy
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(tempo,320,147); 
 
