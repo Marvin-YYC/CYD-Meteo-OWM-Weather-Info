@@ -11,20 +11,21 @@ I believe it will run on other CYD's with some configuration  changes
 ## Details
 - USB Powered
 - Deep sleep mode - ESP deep sleep mode shuts off processor and screen at night.
-- Weather Data from Meteo
-- Weather Data from Open Weather Map - you will need your own API key
+- Weather Data from Meteo - updates every 20 minutes - no api needed
+- Weather Data from Open Weather Map - updates every 20 minutes - you will need your own API key
 - 24hr Clock with seconds
 - Sunrise/set time, length of day in hrs+min.
-- Condtions - Current temperature in °C - Daily Hi/Lo temp in °C - Relative Humidity
+- Condtions - Current temperature in °C - Daily Hi/Lo temp in °C - Relative Humidity - Cloud cover
 - Current Wind chill/Feel like temp in °C temp, colour changes depending on conditions as per ECC standard
-- Current Sustained Wind speed and Wind gust in km/h, colour changes if wind conditions are above normal (set parameters manually)
+- Current Sustained Wind speed and Wind gust in km/h, colour changes if wind conditions are above normal (set your own parameters for local conditions)
 - Current Wind direction compass/intercardinal points
 - Dewpoint in °C - Cloud cover in % - Visibility in km - CAPE J/kg
 - Possibility of Precipitation in %, over 75% text goes greenyellow
 - UV index in coloured warnings as per international standard, green = low 1-3 / Purple = Extreme 11+.
 - NEW Feb 13/25 - Local Aurora Borealis data with thanks to University of Alberta, Canada.  https://www.aurorawatch.ca  Probability of auroral displays occurring (PoAB) in % above 50% text goes yellow above 70% red.  Website data is updated hourly at 11 minutes past the hour.
 - NEW Feb 16/25 - AQI data from https://aqicn.org - You will need to obtain your own free API token here> https://aqicn.org/data-platform/token/
-- NEW Mar 9/25 - Added Open Weather Map information in top right corner.  - you will need your own API key 
+- NEW Mar 9/25 - Added Open Weather Map information in top right corner.  - you will need your own API key
+- NOTE: The touch screen feature is not enabled in this sketch.
 
 
 ![signal-2025-03-09-154124](https://github.com/user-attachments/assets/9ca6cc61-ab27-4811-96f1-fe3ff406c281)
