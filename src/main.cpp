@@ -288,8 +288,7 @@ void drawAQI(int aqiValue, int stationIndex) {
   JsonDocument jsonDoc;
   String payload;
   DeserializationError error;
-  //String timeString; //>>>>
-  int isDay;
+  String owmIcon;
   float owmTemp;
   int owmHumi;
   float owmWind;
@@ -300,6 +299,7 @@ void drawAQI(int aqiValue, int stationIndex) {
   int owmCode;
   String owmDesc;
   String owmCond;
+
   float owmWndDir;
   
   // get OWM Data
@@ -319,7 +319,7 @@ void drawAQI(int aqiValue, int stationIndex) {
 
   error = deserializeJson(jsonDoc,payload);
   if (!error) {
-
+    owmIcon = jsonDoc["weather"][0]["icon"].as<String>();
     owmCode = jsonDoc["weather"][0]["id"];
     owmDesc = jsonDoc["weather"][0]["description"].as<String>();
     owmTemp = jsonDoc["main"]["temp"];  
@@ -332,25 +332,29 @@ void drawAQI(int aqiValue, int stationIndex) {
     owmFeelTemp = jsonDoc["main"]["feels_like"];
     int owmWndDir = 0;
 
-    if (jsonDoc["wind"]["deg"].is<int>()) {
-      owmWndDir = jsonDoc["wind"]["deg"].as<int>();  // Extract wind direction in degrees
-    }
-
+        if (jsonDoc["wind"]["deg"].is<int>()) {
+          owmWndDir = jsonDoc["wind"]["deg"].as<int>();  // Extract wind direction in degrees
+            }
+        if (owmIcon.endsWith("d")) {
+          Serial.println("Day icon detected ☀️");
+        } else if (owmIcon.endsWith("n")) {
+          Serial.println("Night icon detected 🌙");
+            }
     http.end();
 
     // display forecast  owmDesc
-    drawOWMValue(owmCode,owmDesc,owmCond,owmTemp,owmHumi,owmWind,owmFeelTemp,owmGust,owmCldCvr,owmVisib,isDay,owmWndDir);
+    drawOWMValue(owmIcon,owmCode,owmDesc,owmCond,owmTemp,owmHumi,owmWind,owmFeelTemp,owmGust,owmCldCvr,owmVisib,owmWndDir);
       return true;
     }
       return true;
   }
 
 /**/ 
-const char* getIconOWM(int owmCode, int isDay) {
-  if (owmCode == 800 & isDay == 1) { sprite.setTextColor(TFT_GOLD); return "N"; }  // Clear day/sun
-  if (owmCode == 800 & isDay == 0) {sprite.setTextColor(TFT_SILVER); return "I"; }  // Clear night/moon
-  if (owmCode == 801 || owmCode == 802 & isDay == 1) { sprite.setTextColor(TFT_GOLD); return "C"; }  // Few Clouds day/sun
-  if (owmCode == 801 || owmCode == 802 & isDay == 0) { sprite.setTextColor(TFT_SILVER); return "G"; }  // Few Clouds night/moon
+const char* getIconOWM(int owmCode, String owmIcon) {
+  if (owmCode == 800 && owmIcon.endsWith("d")) { sprite.setTextColor(TFT_GOLD); return "N"; }  // Clear day/sun
+  if (owmCode == 800 && owmIcon.endsWith("n")) {sprite.setTextColor(TFT_SILVER); return "I"; }  // Clear night/moon
+  if (owmCode == 801 || owmCode == 802 && owmIcon.endsWith("d") ) { sprite.setTextColor(TFT_GOLD); return "C"; }  // Few Clouds day/sun
+  if (owmCode == 801 || owmCode == 802 && owmIcon.endsWith("n")) { sprite.setTextColor(TFT_SILVER); return "G"; }  // Few Clouds night/moon
   if (owmCode == 803) { sprite.setTextColor(TFT_SILVER); return "P"; }  // Partly Cloudy
   if (owmCode == 804) { sprite.setTextColor(TFT_SKYBLUE); return "O"; }  // Overcast/Cloudy
   if (owmCode == 701 || owmCode == 741) { sprite.setTextColor(TFT_LIGHTGREY); return "F"; }  // Fog/Mist
@@ -377,7 +381,7 @@ const char* getWindDir(int degrees) { // Cardinal
 }
 
   /**/
-void drawOWMValue(int owmCode,String owmDesc,String owmCond,float owmTemp,int owmHumi,float owmWind,float owmFeelTemp,float owmGust,int owmCldCvr,int owmVisib,int isDay, float owmWndDir) {
+void drawOWMValue(String owmIcon,int owmCode,String owmDesc,String owmCond,float owmTemp,int owmHumi,float owmWind,float owmFeelTemp,float owmGust,int owmCldCvr,int owmVisib,float owmWndDir) {
   char tempo[20];
 
   Serial.println("Drawing Open Weather with Sprites...");
@@ -419,94 +423,100 @@ void drawOWMValue(int owmCode,String owmDesc,String owmCond,float owmTemp,int ow
   sprite.loadFont(arialround20); 
   sprintf(tempo,"%2.0f°",owmFeelTemp);
   sprite.setTextDatum(CR_DATUM);
-  sprite.drawString(tempo,135,35);
+  sprite.drawString(tempo,142,35);
 
   //sprite.setTextColor(TFT_WHITE);
   //sprite.loadFont(arialround14); 
   //sprintf(tempo,"%2d%%",owmHumi);
   //sprite.drawString(tempo,130,47);
 
-  if (owmWind * 3.6 > 64) {   
-    sprite.setTextColor(TFT_RED);
-    }
-    else if (owmWind * 3.6 > 44) { 
-      sprite.setTextColor(TFT_ORANGE);
-    }
-    else if (owmWind * 3.6 > 19) {
-    sprite.setTextColor(TFT_YELLOW);
-    }
-    else {
-    sprite.setTextColor(TFT_WHITE);
-    }
+      if (owmWind * 3.6 > 64) {   
+        sprite.setTextColor(TFT_RED);
+        }
+        else if (owmWind * 3.6 > 44) { 
+          sprite.setTextColor(TFT_ORANGE);
+        }
+        else if (owmWind * 3.6 > 19) {
+        sprite.setTextColor(TFT_YELLOW);
+        }
+        else {
+        sprite.setTextColor(TFT_WHITE);
+        }
   //sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
   sprintf(tempo,"%2.0f /",owmWind * 3.6); // mulitlply m/s by 3.6 to obtain km/hr
   sprite.setTextDatum(CR_DATUM);
   sprite.drawString(tempo,120,64); 
 
-  if (owmGust * 3.6 > 69) {   
-    sprite.setTextColor(TFT_RED);
-}
-else if (owmGust * 3.6 > 45) { 
-  sprite.setTextColor(TFT_ORANGE);
-}
-else if (owmGust * 3.6 > 25) {
-    sprite.setTextColor(TFT_YELLOW);
-}
-else {
-    sprite.setTextColor(TFT_WHITE);
-}
+      if (owmGust * 3.6 > 69) {   
+        sprite.setTextColor(TFT_RED);
+    }
+    else if (owmGust * 3.6 > 45) { 
+      sprite.setTextColor(TFT_ORANGE);
+    }
+    else if (owmGust * 3.6 > 25) {
+        sprite.setTextColor(TFT_YELLOW);
+    }
+    else {
+        sprite.setTextColor(TFT_WHITE);
+    }
   //sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
   sprintf(tempo,"%2.0f",owmGust * 3.6); // mulitlply m/s by 3.6 to obtain km/hr
   sprite.drawString(tempo,141,64);
-  
+
+  sprite.setTextColor(TFT_LIGHTGREY);
+  sprite.loadFont(arialround14); 
+  sprintf(tempo, "%2d%%", owmHumi);
+  sprite.setTextDatum(CL_DATUM);
+  sprite.drawString(tempo,76,34); //70,32 6,25
+
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
-  sprintf(tempo,"c:%2d%%",owmCldCvr);
+  sprintf(tempo, "[%s]", getWindDir(owmWndDir));
+  sprite.setTextDatum(CR_DATUM);
+  sprite.drawString(tempo,78,64); //70,32 6,25
+  
+  sprite.setTextColor(TFT_LIGHTGREY);
+  sprite.loadFont(arialround14); 
+  sprintf(tempo,"%2d",owmCldCvr);
   sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,4,64);
+  sprite.drawString(tempo,3,22);  //4,64
 
-  if (owmVisib * 0.001 > 9.99 ) { 
-  sprintf(tempo,"%+2.0f",owmVisib* 0.001); //OWM does not provide visibility data greater than 10km.  This removes decimal place when vis is greater than 9.99km
-        }
-  else {
-  sprintf(tempo,"%2.1f",owmVisib* 0.001);
-        }
+      if (owmVisib * 0.001 > 9.99 ) { 
+      sprintf(tempo,"%+2.0fkm",owmVisib * 0.001); // *0.001 meters to km. OWM does not provide visibility data greater than 10km.  This removes decimal place when vis is greater than 9.99km
+            }
+      else {
+      sprintf(tempo,"%2.1fkm",owmVisib * 0.001);
+            }
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
   //sprintf(tempo,"%2.1f",owmVisib* 0.001);
   sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,59,64);
+  sprite.drawString(tempo,4,64); //59,64
 
   sprite.loadFont(weatherfont60); 
-  sprintf(tempo, "%s", getIconOWM(owmCode,isDay));
+  sprintf(tempo, "%s", getIconOWM(owmCode,owmIcon));
   sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,30,15);
+  sprite.drawString(tempo,37,14);  //35,15
 
   sprite.setTextColor(TFT_DARKGREY);
   sprite.loadFont(arialround14); 
   sprintf(tempo,"%d",owmCode); //just using this for debug weather code
   sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,4,8);
-
-  sprite.setTextColor(TFT_LIGHTGREY);
-  sprite.loadFont(arialround14); 
-  sprintf(tempo, "[%s]", getWindDir(owmWndDir));
-  sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,70,32); //6,25
+  sprite.drawString(tempo,2,6);
 
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
   sprintf(tempo, "%s", owmCond.c_str());
   sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,4,40);
+  sprite.drawString(tempo,4,38);
 
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
   sprintf(tempo, "%s", owmDesc.c_str());
   sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,4,52);
+  sprite.drawString(tempo,4,50);
   
   sprite.drawLine(0, 0, 0, 70, TFT_LIGHTGREY);
   sprite.pushSprite(178,0); // 190,0
