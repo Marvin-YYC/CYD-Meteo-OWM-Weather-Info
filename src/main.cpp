@@ -349,12 +349,11 @@ void drawAQI(int aqiValue, int stationIndex) {
       return true;
   }
 
-/**/ 
 const char* getIconOWM(int owmCode, String owmIcon) {
   if (owmCode == 800 && owmIcon.endsWith("d")) { sprite.setTextColor(TFT_GOLD); return "N"; }  // Clear day/sun
   if (owmCode == 800 && owmIcon.endsWith("n")) {sprite.setTextColor(TFT_SILVER); return "I"; }  // Clear night/moon
-  if (owmCode == 801 || owmCode == 802 && owmIcon.endsWith("d") ) { sprite.setTextColor(TFT_GOLD); return "C"; }  // Few Clouds day/sun
-  if (owmCode == 801 || owmCode == 802 && owmIcon.endsWith("n")) { sprite.setTextColor(TFT_SILVER); return "G"; }  // Few Clouds night/moon
+  if ((owmCode == 801 || owmCode == 802) && owmIcon.endsWith("d") ) { sprite.setTextColor(TFT_GOLD); return "C"; }  // Few Clouds day/sun
+  if ((owmCode == 801 || owmCode == 802) && owmIcon.endsWith("n")) { sprite.setTextColor(TFT_SILVER); return "G"; }  // Few Clouds night/moon
   if (owmCode == 803) { sprite.setTextColor(TFT_SILVER); return "P"; }  // Partly Cloudy
   if (owmCode == 804) { sprite.setTextColor(TFT_SKYBLUE); return "O"; }  // Overcast/Cloudy
   if (owmCode == 701 || owmCode == 741) { sprite.setTextColor(TFT_LIGHTGREY); return "F"; }  // Fog/Mist
@@ -380,7 +379,6 @@ const char* getWindDir(int degrees) { // Cardinal
   return "NW";                                       // Northwest
 }
 
-  /**/
 void drawOWMValue(String owmIcon,int owmCode,String owmDesc,String owmCond,float owmTemp,int owmHumi,float owmWind,float owmFeelTemp,float owmGust,int owmCldCvr,int owmVisib,float owmWndDir) {
   char tempo[20];
 
@@ -475,7 +473,7 @@ void drawOWMValue(String owmIcon,int owmCode,String owmDesc,String owmCond,float
   sprite.loadFont(arialround14); 
   sprintf(tempo, "[%s]", getWindDir(owmWndDir));
   sprite.setTextDatum(CR_DATUM);
-  sprite.drawString(tempo,78,64); //70,32 6,25
+  sprite.drawString(tempo,82,64); //70,32 6,25
   
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround14); 
