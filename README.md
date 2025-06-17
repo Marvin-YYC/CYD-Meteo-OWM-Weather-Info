@@ -27,7 +27,7 @@ I believe it will run on other CYD's with some configuration  changes
 - NEW Mar 9/25 - Added Open Weather Map information in top right corner.  - you will need your own API key
 - NOTE: The touch screen feature is not enabled in this sketch.
 
-
+![signal-2025-06-17-150531](https://github.com/user-attachments/assets/acd38a9f-3e45-4964-9f8b-2a6d3368cb4c)
 ![signal-2025-03-09-154124](https://github.com/user-attachments/assets/9ca6cc61-ab27-4811-96f1-fe3ff406c281)
 ^ ^ Yup, it's windy here today :)
 ![signal-2025-02-14-200904](https://github.com/user-attachments/assets/cbea3f9b-5333-438d-86f3-41a7fc57fca8)
