@@ -561,8 +561,8 @@ const char* getWindDir(int degrees) { // Cardinal
   sprite.setTextColor(TFT_CYAN);
   sprite.loadFont(arialround14); 
   sprite.setTextDatum(CL_DATUM);
-  String desc1 = owmDesc.substring(0, 18);  // Adjust these lengths per font size //0,18
-  String desc2 = owmDesc.length() > 18 ? owmDesc.substring(18, 43) : ""; // >18  owmDesc.substring(18, 35) : "";
+  String desc1 = owmDesc.substring(0, 15);  // Adjust these lengths per font size //0,18
+  String desc2 = owmDesc.length() > 15 ? owmDesc.substring(15, 43) : ""; // >18  owmDesc.substring(18, 35) : "";
   sprite.drawString(desc1, 2, 43);  // First line  //(desc1, 4, 38); //35
   if (desc2.length() > 0) {
     sprite.drawString(desc2, 2, 53);  // Second line //(desc2, 4, 48); // 45
