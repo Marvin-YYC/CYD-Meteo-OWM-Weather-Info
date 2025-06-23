@@ -25,6 +25,7 @@ I believe it will run on other CYD's with some configuration  changes
 - NEW Feb 13/25 - Local Aurora Borealis data with thanks to University of Alberta, Canada.  https://www.aurorawatch.ca  Probability of auroral displays occurring (PoAB) in % above 50% text goes yellow above 70% red.  Website data is updated hourly at 11 minutes past the hour.
 - NEW Feb 16/25 - AQI data from https://aqicn.org - You will need to obtain your own free API token here> https://aqicn.org/data-platform/token/
 - NEW Mar 9/25 - Added Open Weather Map information in top right corner.  - you will need your own API key
+- Make changes to weather location, and API keys in the WeatherStation.h file.
 - NOTE: The touch screen feature is not enabled in this sketch.
 
 ![signal-2025-06-17-150531](https://github.com/user-attachments/assets/acd38a9f-3e45-4964-9f8b-2a6d3368cb4c)
