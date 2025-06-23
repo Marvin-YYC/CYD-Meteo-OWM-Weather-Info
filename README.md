@@ -28,9 +28,21 @@ I believe it will run on other CYD's with some configuration  changes
 - NOTE: The touch screen feature is not enabled in this sketch.
 
 ![signal-2025-06-17-150531](https://github.com/user-attachments/assets/acd38a9f-3e45-4964-9f8b-2a6d3368cb4c)
+
+![uv-ultraviolet-index](https://github.com/user-attachments/assets/e26f8e00-f2e1-40be-9a87-9c4d5379fa89)
+
+![image](https://github.com/user-attachments/assets/9e7e88d3-697f-455d-a1bc-df84681ca872)
+
+![image](https://github.com/user-attachments/assets/c6758020-562c-49a0-911a-2d589888cdc9)
+I believe this CAPE information is relative to altitude.  The settings I have are based on a city near the rockies over 1000m ASL.
+
+![image](https://github.com/user-attachments/assets/ddfb19cf-d5ac-431c-a3b9-b1c619e781dd)
+
 ![signal-2025-03-09-154124](https://github.com/user-attachments/assets/9ca6cc61-ab27-4811-96f1-fe3ff406c281)
 ^ ^ Yup, it's windy here today :)
-![signal-2025-02-14-200904](https://github.com/user-attachments/assets/cbea3f9b-5333-438d-86f3-41a7fc57fca8)
+
+![signal-2025-02-14-200904](https://github.com/user-attachments/assets/cbea3f9b-5333-438d-86f3-41a7fc57f![uv-ultraviolet-index](https://github.com/user-attachments/assets/e11601fe-80d8-4b6a-bb96-0077f7fa8f78)
+ca8)
 ^ ^ With forcast from Aurora Watch shown bottom left
 ![signal-2025-02-10-110216_002](https://github.com/user-attachments/assets/9a12e640-1086-4056-9009-626a194f2bd7)
 ![signal-2025-01-28-112736_002](https://github.com/user-attachments/assets/a062e056-a35f-4237-b371-10a3463e1ece)
