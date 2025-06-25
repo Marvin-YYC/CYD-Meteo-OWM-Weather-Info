@@ -274,14 +274,13 @@ void drawAQI(int aqiValue, int stationIndex) {
       sprite.setTextColor(TFT_RED); 
       sprite.fillSprite(TFT_YELLOW);
   }
-  sprite.loadFont(arialround20); 
-  sprite.setCursor(15, 3);  
+  sprite.loadFont(arialround14); 
   sprite.setTextDatum(BR_DATUM);
-  sprintf(tempo,"%d",aqiValue); 
+  sprite.setCursor(0, 5);  
+  sprintf(tempo,"aqI: %d",aqiValue); 
   sprite.print(tempo);
   // Adjust position based on station index
-  int xPos = 200 + (stationIndex * 40);  // Right side position Spacing: 40 pixels apart 
-  // I couldn't find room for a description here.  If you add a third station you will have to add space for it.
+  int xPos = 140 + (stationIndex * 60);  // Right side position Spacing
   sprite.pushSprite(xPos, 220); //220
   delay(500); 
   sprite.deleteSprite();  
@@ -898,12 +897,6 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
         sprite.fillCircle (245, 11, 7, TFT_SILVER);  // Little full moon to show sun has set
         sprite.fillCircle (249, 11, 5, WS_BLACK); //251 // add this to make the moon crescent shape
       }  
-  //sprite.setTextColor(TFT_LIGHTGREY);
-  //sprite.loadFont(arialround14);
-  //sprintf(tempo,"[%d]", isDay); 
-  //sprite.setTextDatum(BL_DATUM);
-  //sprite.drawString(tempo,240,22);  
-
 // Shows time stamp of last update
   char timeBuffer[20];
   sprintf(timeBuffer, "%02d:%02d", now.tm_hour, now.tm_min);
@@ -927,39 +920,6 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
       if (currTemp < 0) {
           intString = "-" + String(abs(intPart));  // Add negative sign manually
 }
-
-      if (currTemp > 33.00) { 
-          sprite.setTextColor(TFT_RED);
-          sprite.loadFont(weatherfont60);
-          sprintf(tempo,"H");
-          sprite.setTextDatum(BR_DATUM);
-          sprite.drawString(tempo,235,54);
-          }
-        else if (currTemp > 28.00) { 
-          sprite.setTextColor(TFT_YELLOW);
-          sprite.loadFont(weatherfont60);
-          sprintf(tempo,"H");
-          sprite.setTextDatum(BR_DATUM);
-          sprite.drawString(tempo,235,54);
-          } 
-        else if (currTemp > 19.5) { 
-          sprite.setTextColor(TFT_DARKGREEN);
-          sprite.loadFont(weatherfont60);
-          sprintf(tempo,"H");
-          sprite.setTextDatum(BR_DATUM);
-          sprite.drawString(tempo,235,54);
-          }
-        else if (currTemp < -14.9) { 
-          sprite.setTextColor(TFT_BLUE);
-          sprite.loadFont(weatherfont60);
-          sprintf(tempo,"E");
-          sprite.setTextDatum(BR_DATUM);
-          sprite.drawString(tempo,235,54);
-          }
-        else{
-          sprite.setTextColor(TFT_BLACK);
-          }
-
   intString += ".";
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround44);
@@ -983,7 +943,6 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
   sprite.setTextDatum(BL_DATUM);
   sprite.drawString(tempo, 140, 120); //130,120 | 140,110
 
-      
             if (feelTemp < -27.00) { 
                 sprite.setTextColor(TFT_RED);
             }
@@ -1008,16 +967,16 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
             else {
                 sprite.setTextColor(TFT_DARKGREY);
             }
-  sprite.loadFont(arialround36);
+  sprite.loadFont(arialround26);
   sprintf(tempo, "%3.0f", feelTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo, 182, 177); // 190,177  130, 170    30,160
+  sprite.drawString(tempo, 250, 50); // 190,177  130, 170    30,160
 
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround14);
-  sprintf(tempo,"°C"); // separated this from lines above to make °C smaller font
+  sprintf(tempo,"°"); // separated this from lines above to make °C smaller font
   sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(tempo,183,157); // 191,157  185,150   185,140   168,35 full right - middle of digit 165,45
+  sprite.drawString(tempo,251,39); // 191,157  185,150   185,140   168,35 full right - middle of digit 165,45
 
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround20);  
