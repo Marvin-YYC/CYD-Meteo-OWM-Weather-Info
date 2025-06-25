@@ -28,6 +28,8 @@ I believe it will run on other CYD's with some configuration  changes
 - Make changes to weather location, and API keys in the WeatherStation.h file.
 - NOTE: The touch screen feature is not enabled in this sketch.
 
+![signal-2025-06-25-110724](https://github.com/user-attachments/assets/8cfbb152-6cee-41ab-9ca8-ca0dd53fa548)
+
 ![signal-2025-06-17-150531](https://github.com/user-attachments/assets/acd38a9f-3e45-4964-9f8b-2a6d3368cb4c)
 
 ![uv-ultraviolet-index](https://github.com/user-attachments/assets/e26f8e00-f2e1-40be-9a87-9c4d5379fa89)
