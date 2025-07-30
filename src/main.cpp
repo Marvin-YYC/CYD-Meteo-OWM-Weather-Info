@@ -784,14 +784,30 @@ const char* getIconFromMeteo(int meteo, int isDay) {
   if (meteo == 1 & isDay == 0) return (sprite.setTextColor(TFT_SILVER), "G");  // Few Clouds night/moon
   if (meteo == 2) return (sprite.setTextColor(TFT_SILVER), "P");  // Partly Cloudy
   if (meteo == 3) return (sprite.setTextColor(TFT_SKYBLUE), "O");  // Overcast/Cloudy
-  if (meteo == 45 || meteo == 48) return ((TFT_LIGHTGREY), "F");  // Fog/Mist
-  if (meteo == 51 || meteo == 61 || meteo == 80 || meteo == 83) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Light rain
-  if (meteo == 53 || meteo == 55 || meteo == 63 || meteo == 65) return (sprite.setTextColor(TFT_SKYBLUE), "B");  // Rain
-  if (meteo == 56 || meteo == 57 || meteo == 66 || meteo == 67) return (sprite.setTextColor(TFT_GREENYELLOW), "M");  // Freezing rain
-  if (meteo == 73 || meteo == 85 || meteo == 71) return (sprite.setTextColor(TFT_WHITE),"L");  // Light snow
-  if (meteo == 75 || meteo == 77) return (sprite.setTextColor(TFT_WHITE), "D");  // Moderate Snow
-  if (meteo == 86) return (sprite.setTextColor(TFT_WHITE), "D");  // Heavy Snow
-  if (meteo >= 95 && meteo <= 99) return (sprite.setTextColor(TFT_ORANGE), "K");  // Storms
+  if (meteo == 45) return ((TFT_LIGHTGREY), "F");  // Fog
+  if (meteo == 48) return ((TFT_WHITE), "F");  // Freezing Fog
+  if (meteo == 51) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Light Drizzle
+  if (meteo == 53) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Mod Drizzle
+  if (meteo == 55) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Hvy Drizzle
+  if (meteo == 56) return (sprite.setTextColor(TFT_GREENYELLOW), "M");  // Lt Frzng Drizzle
+  if (meteo == 57) return (sprite.setTextColor(TFT_GREENYELLOW), "M");  // Hvy Frzng Drizzle
+  if (meteo == 61) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Light Rain
+  if (meteo == 63) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Mod Rain
+  if (meteo == 65) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Hvy Rain
+  if (meteo == 66) return (sprite.setTextColor(TFT_GREENYELLOW), "M");  // Lt Frzng Rain
+  if (meteo == 67) return (sprite.setTextColor(TFT_GREENYELLOW), "M");  // Hvy Frzng Rain
+  if (meteo == 71) return (sprite.setTextColor(TFT_WHITE),"L");  // Light Snow
+  if (meteo == 73) return (sprite.setTextColor(TFT_WHITE),"L");  // Mod Snow
+  if (meteo == 75) return (sprite.setTextColor(TFT_WHITE),"D");  // Heavy Snow
+  if (meteo == 77) return (sprite.setTextColor(TFT_WHITE),"L");  // Snow Grains
+  if (meteo == 80 ) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Lt Rain Shwrs
+  if (meteo == 81 ) return (sprite.setTextColor(TFT_SKYBLUE), "M");  // Mod Rain Shwrs
+  if (meteo == 82 ) return (sprite.setTextColor(TFT_GREENYELLOW), "K");  // Violent Rain Shwrs
+  if (meteo == 85 ) return (sprite.setTextColor(TFT_WHITE), "L");  // Lt Snow Shwrs
+  if (meteo == 86 ) return (sprite.setTextColor(TFT_WHITE), "L");  // Hvy Snow Shwrs
+  if (meteo == 95 ) return (sprite.setTextColor(TFT_YELLOW), "K");  // Thunderstorm
+  if (meteo == 96 ) return (sprite.setTextColor(TFT_ORANGE), "K");  // T-Storm w/Hail
+  if (meteo == 99 ) return (sprite.setTextColor(TFT_RED), "K");  // T-Storm w/Hvy Hail
   return (sprite.setTextColor(TFT_DARKGREY), "J");  // Unknown J = UMBRELLA
 }
 // return Short Weather Description from meteo code
@@ -800,16 +816,33 @@ String getDescFromMeteo(int meteo) {
   if (meteo == 1) return "Few Clouds";
   if (meteo == 2) return "Partly Cloudy";
   if (meteo == 3) return "Overcast";
-  if (meteo == 45 || meteo == 48) return "Fog/Mist";
-  if (meteo == 51 || meteo == 61 || meteo == 80 || meteo == 83) return "Light Rain";
-  if (meteo == 53 || meteo == 55 || meteo == 63 || meteo == 65) return "Rain";
-  if (meteo == 56 || meteo == 57 || meteo == 66 || meteo == 67) return "Freeze Rain";
+  if (meteo == 45) return "Fog";
+  if (meteo == 48) return "Freezing Fog";
+  if (meteo == 51) return "Light Drizzle";
+  if (meteo == 53) return "Mod Drizzle";
+  if (meteo == 55) return "Hvy Drizzle";
+  if (meteo == 56) return "Lt Frzng Drizzle";
+  if (meteo == 57) return "Hvy Frzng Drizzle";
+  if (meteo == 61) return "Light Rain";
+  if (meteo == 63) return "Mod Rain";
+  if (meteo == 65) return "Heavy Rain";
+  if (meteo == 66) return "Lt Frzng Rain";
+  if (meteo == 67) return "Hvy Frzng Rain";
   if (meteo == 71) return "Light Snow";
-  if (meteo == 73 || meteo == 75 || meteo == 77) return "Mod Snow";
-  if (meteo == 85 || meteo == 86) return "Heavy Snow";
-  if (meteo >= 95 && meteo <= 99) return "Storm";
+  if (meteo == 73) return "Mod Snow";
+  if (meteo == 75) return "Heavy Snow";
+  if (meteo == 77) return "Snow Grains";
+  if (meteo == 80) return "Lt Rain Shwrs";
+  if (meteo == 81) return "Mod Rain Shwrs";
+  if (meteo == 82) return "Violent Rain Shwrs";
+  if (meteo == 85) return "Lt Snow Shwrs";
+  if (meteo == 86) return "Hvy Snow Shwrs";
+  if (meteo == 95) return "Thunderstorm";
+  if (meteo == 96) return "T-Storm w/Hail";
+  if (meteo == 99) return "T-Storm w/Hvy Hail";
   return "? ? ? ?";
 }
+
 
 bool drawTime(void *){
   struct tm now;
