@@ -1237,13 +1237,25 @@ sprite.drawString(tempo, 85, 90);
   sprite.setTextDatum(BL_DATUM);
   sprite.drawString(tempo,0,150);
 
-  sprite.setTextColor(TFT_LIGHTGREY);
+      if (minTemp <= -15) {   // If min forecast temp is lower than or = -15 number is blue
+        sprite.setTextColor(TFT_SKYBLUE);
+      }
+    else {
+        sprite.setTextColor(TFT_LIGHTGREY);
+      }
+  //sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2.0f°",minTemp);
   sprite.setTextDatum(BR_DATUM);
   sprite.drawString(tempo,53,46); //53,60
-  
-  sprite.setTextColor(TFT_LIGHTGREY);
+
+   if (maxTemp >= 27) {   // If max forecast temp is higher than or = 27 number is magenta
+        sprite.setTextColor(TFT_MAGENTA);
+      }
+    else {
+        sprite.setTextColor(TFT_LIGHTGREY);
+      }
+  //sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2.0f°",maxTemp);
   sprite.setTextDatum(BR_DATUM);
