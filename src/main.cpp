@@ -997,6 +997,9 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
             else if (feelTemp < 20.00) { 
             sprite.setTextColor(TFT_DARKGREY);
             }
+               else if (feelTemp >= 25.00) { 
+            sprite.setTextColor(TFT_MAGENTA); 
+            }
             else {
                 sprite.setTextColor(TFT_DARKGREY);
             }
