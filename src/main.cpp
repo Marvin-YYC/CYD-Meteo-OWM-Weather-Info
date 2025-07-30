@@ -447,6 +447,9 @@ const char* getWindDir(int degrees) { // Cardinal
         else if (owmFeelTemp < 20.00) { 
         sprite.setTextColor(TFT_DARKGREY);
         }
+          else if (owmFeelTemp >= 25.00) { 
+        sprite.setTextColor(TFT_MAGENTA);
+        }
         else {
             sprite.setTextColor(TFT_DARKGREY);
         }
