@@ -15,25 +15,38 @@ int lastUpdateMinute = -1;
 
 //bool getaqiData(void*); // AQI Single station
 //void drawAQI(int aqiValue); // AQI Single station
-
 #define TFT_BL 21
 #define BACKLIGHT_PIN 21
-
 //--- Time object
 auto timer = timer_create_default();
+
+void showStartupScreen() {
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_GREENYELLOW, TFT_BLACK);
+    tft.loadFont(arialround20); 
+    tft.setTextDatum(MC_DATUM);
+    tft.drawString("Corvid Weather Info Aggregator", tft.width() / 2, tft.height() / 2 - 20);
+  
+    tft.unloadFont();
+    tft.loadFont(arialround14);
+    tft.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
+    tft.drawString("Starting up...", tft.width() / 2, tft.height() / 2 + 20);
+    delay(3000); 
+}
 
 void setup() {
   Serial.begin(115200);
   Serial.begin(115200);
+  tft.init();
+  tft.setRotation(1);  // Adjust as needed
+  showStartupScreen(); // Display the splash screen first
   bool getAuroraData(void*);
   bool getaqiData(void*);
-  //bool getCanAirData(void*);
 
   while (!Serial) {}; 
   Serial.print("WeatherStation");
   Serial.println(VW_Version);
-  
-    delay(1000);
+  delay(1000);
 
   //--- WiFi connection using Captive_AP.
   wifiManager.setConfigPortalTimeout(5000);
@@ -518,7 +531,8 @@ const char* getWindDir(int degrees) { // Cardinal
   
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround14); 
-  sprintf(tempo,"%2.0f",owmCldCvr * 0.1); // converted cloud cover to make smaller, 100% = 10 80% = 8, etc.   original - sprintf(tempo,"%2d",owmCldCvr);
+  sprintf(tempo,"%2d%",owmCldCvr); // shows cloud cover three digit no % 
+  //sprintf(tempo,"%2.0f",owmCldCvr * 0.1); // converted cloud cover to make smaller, 100% = 10 80% = 8, etc.   original - sprintf(tempo,"%2d",owmCldCvr);
   sprite.setTextDatum(CL_DATUM);
   sprite.drawString(tempo,2,22);  //4,64
 
@@ -899,7 +913,7 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
   lastUpdateHour = now.tm_hour;
   lastUpdateMinute = now.tm_min;
   
-  sprite.createSprite(320,170); 
+  sprite.createSprite(320,150); 
   sprite.fillSprite(WS_BLACK);
   sprite.setTextColor(TFT_CYAN); 
   sprite.loadFont(arialround20); 
@@ -1274,3 +1288,4 @@ sprite.drawString(tempo, 85, 90);
 
 }
 /////////////////
+
