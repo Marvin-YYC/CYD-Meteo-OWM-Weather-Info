@@ -71,7 +71,7 @@ const char* auroraURL = "https://www.aurorawatch.ca/AWVal.txt";
   
 String owmServerURL = "https://api.openweathermap.org/data/2.5/weather?q=" + owmTown + "," + owmCountry + "&units=metric&APPID=" + owmKey;
 
-String meteoWeatherServer = "https://api.open-meteo.com/v1/forecast?latitude=" + townLat + "&longitude=" + townLon + "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,daylight_duration,sunrise,sunset,&current=weather_code,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,apparent_temperature,cloud_cover,visibility,wind_direction_10m,dew_point_2m,is_day,cape,lightning_potential,&timezone=America%2FDenver&forecast_days=1";
+String meteoWeatherServer = "https://api.open-meteo.com/v1/forecast?latitude=" + townLat + "&longitude=" + townLon + "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,daylight_duration,sunrise,sunset,&current=weather_code,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,apparent_temperature,cloud_cover,visibility,wind_direction_10m,dew_point_2m,is_day,cape,lightning_potential,&timezone=" + timeZone + "&forecast_days=1";
 
 const char *days[] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 const char *months[] = {"Jan","Feb","Mar","Apr","May","June","Jul","Aug","Sept","Oct","Nov","Dec"};
@@ -103,3 +103,4 @@ void setupApi();
 void handlePost();
 
 #endif 
+
