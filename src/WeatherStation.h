@@ -57,7 +57,7 @@ const String waqiStn2 = "@5477";  // set AQI station 2
 WebServer server(80);
 
 // API Web server for accurate time getTime.
-String timeServer = "https://timeapi.io/api/time/current/zone?timeZone=" + timeZone;
+String timeServer = "https://time.now/developer/api/timezone/" + timeZone;
 
  //AQI using multiple stations from WAQI server.  You will need to obtain your own API key from them. 
 String aqicnURLs[] = {
@@ -103,4 +103,5 @@ void setupApi();
 void handlePost();
 
 #endif 
+
 
