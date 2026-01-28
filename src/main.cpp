@@ -1301,14 +1301,14 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
   sprite.loadFont(arialround26);
   sprintf(tempo, "%3.0f", feelTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo, 250, 50); //<<
+  sprite.drawString(tempo, 262, 50); //<<
   //sprite.drawString(tempo, 172, 177); // 182,177
 
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround14);
   sprintf(tempo,"°"); // separated this from lines above to make °C smaller font
   sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(tempo,251,39);
+  sprite.drawString(tempo,263,39);
   //sprite.drawString(tempo,173,157); // 183,157  168,35 full right - middle of digit 165,45
 
   sprite.setTextColor(TFT_LIGHTGREY);
@@ -1553,7 +1553,7 @@ sprite.drawString(tempo,80,150);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2.0f°",minTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo,53,46); //53,60
+  sprite.drawString(tempo,44,46); 
 
    if (maxTemp >= 27) {   // If max forecast temp is higher than or = 27 number is magenta
         sprite.setTextColor(TFT_MAGENTA);
@@ -1565,13 +1565,14 @@ sprite.drawString(tempo,80,150);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2.0f°",maxTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo,316,46); //316,60
-  sprite.drawRoundRect(0, 24, 56, 22, 5, TFT_SKYBLUE); // little box around daily low temp
-  sprite.drawRoundRect(263, 24, 56, 22, 5, TFT_MAGENTA); // little box around daily high temp
+  sprite.drawString(tempo,316,46); 
+  sprite.drawRoundRect(0, 24, 48, 22, 5, TFT_SKYBLUE); // little box around daily low temp
+  sprite.drawRoundRect(272, 24, 48, 22, 5, TFT_MAGENTA); // little box around daily high temp
   //drawRoundRect( left/right = x,  up/down = y, width, height, round, colour),
-  sprite.pushSprite(0,70);//150,50
+  sprite.pushSprite(0,70);
   sprite.deleteSprite();
 
 }
 /////////////////
+
 
