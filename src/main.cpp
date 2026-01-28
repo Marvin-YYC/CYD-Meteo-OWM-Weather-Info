@@ -908,7 +908,7 @@ bool getTime(void *) {
     Serial.println(httpResponseCode);
     Serial.println(payload);
   } else {
-    Serial.print("ERROR: bad HTTP1 request: ");
+    Serial.print("ERROR: bad HTTP request: ");
     Serial.println(httpResponseCode);
     http.end();
     delay(500);
@@ -917,14 +917,27 @@ bool getTime(void *) {
 
   error = deserializeJson(jsonDoc, payload);
   if (!error) {
-    datetime = jsonDoc["dateTime"];
-    dt = parseISO8601(String(datetime));
-    rtc.setTime(dt.second, dt.minute, dt.hour, dt.day, dt.month, dt.year);
 
-    // Use global DST flag
-    isDSTActive = jsonDoc["dstActive"];
+    // time.now field name
+    datetime = jsonDoc["datetime"];
+    dt = parseISO8601(String(datetime));
+
+    rtc.setTime(
+      dt.second,
+      dt.minute,
+      dt.hour,
+      dt.day,
+      dt.month,
+      dt.year
+    );
+
+    // time.now DST flag
+    isDSTActive = jsonDoc["dst"];
     Serial.print("DST Active: ");
     Serial.println(isDSTActive ? "true" : "false");
+  } else {
+    Serial.print("JSON parse failed: ");
+    Serial.println(error.c_str());
   }
 
   http.end();
@@ -1561,3 +1574,4 @@ sprite.drawString(tempo,80,150);
 
 }
 /////////////////
+
