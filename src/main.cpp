@@ -15,7 +15,7 @@ bool getMeteoForecast(void*);
 int lastUpdateHour = -1;
 int lastUpdateMinute = -1;
 int lastAuroraHour12 = -1;  // Last hour we ran at :12
-int lastAuroraHour16 = -1;  // Last hour we ran at :16
+//int lastAuroraHour16 = -1;  // Last hour we ran at :16
 
 bool isFetching = false;
 bool jobTimeSync = false;
@@ -24,20 +24,16 @@ bool jobAurora = false;
 bool jobAQI = false;
 bool jobOWM = false;
 
+bool aqiStale[4] = {false, false, false, false};
+int aqiAgeStatus[4] = {0, 0, 0, 0};
+//const unsigned long AQI_AGE_TWO = 2UL * 60UL * 60UL + 6UL * 60UL;  // 2h 6m
+const unsigned long AQI_AGE_TWO = 2UL * 60UL * 60UL;      // 2 hour // + 6UL * 60UL;  // 2h 6m
+const unsigned long AQI_AGE_THREE = 3UL * 60UL * 60UL;    //3 hour // + 6UL * 60UL;  // 3h 6m
+const unsigned long AQI_AGE_FOUR = 4UL * 60UL * 60UL;     // 4h
+
 // --- Time sync control ---
 unsigned long lastTimeSync = 0;                    // timestamp of last sync
 const unsigned long timeSyncInterval = 30 * 60 * 1000; // 30 minutes (in ms)
-
-//bool getaqiData(void*); // AQI Single station
-//void drawAQI(int aqiValue); // AQI Single station
-
-// Job flags (set by scheduler, consumed in loop)
-//volatile bool jobTimeSync = false;
-//volatile bool jobMeteo    = false;
-//volatile bool jobAurora   = false;
-//volatile bool jobAQI      = false;
-//volatile bool jobOWM      = false;
-//volatile bool isFetching  = false;  // Prevent running >1 network job at once
 unsigned long lastCheckMillis = 0;  // For the schedule checker (millis-based)
 const unsigned long CHECK_EVERY_MS = 15000; // check every 15s
 // “Run-once per window” guards
@@ -86,7 +82,6 @@ void scheduleJobsByClock() {
       Serial.println("[JOB] Time sync scheduled");
     }
   }
-
  /*
 // ----- Time sync @ :00, :15, :30, :45 (1-minute windows: [M, M+1))
   int quarter = (mn / 15); // 0..3
@@ -101,15 +96,11 @@ void scheduleJobsByClock() {
     }
   }
 */
-  
   // ----- Meteo @ :00, :20, :40 (windows [M, M+1))
   int meteoBucket = -1;
   if (mn >= 0 && mn < 1)   meteoBucket = 0;
   else if (mn >= 20 && mn < 21) meteoBucket = 20;
   else if (mn >= 40 && mn < 41) meteoBucket = 40;
-  //if (mn >= 10 && mn < 11)   meteoBucket = 10;
-  //else if (mn >= 30 && mn < 31) meteoBucket = 30;
-  //else if (mn >= 50 && mn < 51) meteoBucket = 50;
   if (meteoBucket >= 0) {
     int key = hr * 100 + meteoBucket;
     if (key != lastMeteoKey) {
@@ -127,8 +118,9 @@ void scheduleJobsByClock() {
   }
   int aqiMinute = -1;
   if (mn >= 2 && mn < 3)     aqiMinute = 2;
-  else if (mn >= 22 && mn < 23) aqiMinute = 22;
-  else if (mn >= 42 && mn < 43) aqiMinute = 42;
+  //else if (mn >= 22 && mn < 23) aqiMinute = 22;
+  //else if (mn >= 42 && mn < 43) aqiMinute = 42;
+  else if (mn >= 32 && mn < 33) aqiMinute = 32; // changed from 3 times per hour to two per hour as gov alberta aqi data only updates once per hour or longer other private staions are more frequent
   if (aqiMinute >= 0) {
     int key = hr * 100 + aqiMinute;
     if (key != lastAQIKey) {
@@ -222,7 +214,6 @@ bool getMeteoForecast(bool allowTimeSync) {
   } else {
     Serial.println("[INFO] Meteo skipped time sync (recently done)");
   }
-  // ... your existing meteo data fetching code here ...
   return true;
 }
 
@@ -260,7 +251,6 @@ void setup() {
   tft.init();
   tft.setRotation(1);  // Adjust as needed
   showStartupScreen(); // Display the splash screen first
-
   // (Optional) kick off an immediate first run:
   jobTimeSync = true;   // get correct time ASAP
   jobMeteo    = true;    // show something on boot
@@ -283,10 +273,8 @@ void setup() {
   _gw.fromString(static_gw);
   _mask.fromString(static_mask);
   _dns.fromString(static_dns);
-
   wifiManager.setHostname(staHostname);
   wifiManager.setSTAStaticIPConfig(_ip,_gw,_mask,_dns);
-
   if(!wifiManager.autoConnect("Access_Weather","12345678")) { //this is the ID and Password for the Wifi Manager (PW must be 8 characters)
     Serial.println("Failed to connect and hit timeout");
     delay(2000); // 3 seconds max
@@ -295,8 +283,6 @@ void setup() {
 
   Serial.println("INFO: connected to WiFi");
   getTime(NULL);
-
-  //--- Initialize display
   tft.init();
   tft.setRotation(1); // (1) = landscape - buttons top (2) = portrait - buttons left (3) Landscape - buttons bottom (4) portrait - reverse image - buttons left 
   //(5) landscape - reverse image - buttons bottom (6) portrait - reverse image - buttons right (7) landscape - reverse image - buttons top. (8) portrait - buttons right
@@ -308,7 +294,6 @@ void setup() {
   ledcAttachPin(BACKLIGHT_PIN, 0);
   ledcWrite(0, 150); // Adjust brightness (0-255) 128 adjust brightness level here<<< 80
 //////~~~~~~~~
-
   tft.fillScreen(WS_BLACK);
   drawTime(NULL);     //  fetch data once immediately on boot
   timer.every(500,drawTime);                // Every 500ms, display time
@@ -336,7 +321,6 @@ if (now.tm_hour >= 23) {    //   Begin deep sleeps at 23:00hrs wakes up when tim
   esp_deep_sleep_start();
   }
 }
-
     //--- getInternet Time From API server and set RTC time.
     DateTime parseISO8601(const String& iso8601) {
       DateTime dt;
@@ -364,18 +348,15 @@ if (now.tm_hour >= 23) {    //   Begin deep sleeps at 23:00hrs wakes up when tim
     HTTPClient http;
     http.setTimeout(5000); 
     http.begin(auroraURL);
-
     int httpResponseCode = http.GET();
     Serial.print("HTTP Response Code: ");
     Serial.println(httpResponseCode);
-
   if (httpResponseCode > 0) {
       String payload = http.getString();
       Serial.println("Aurora Data: " + payload);
       float auroraValue = payload.toFloat();
       Serial.print("Parsed Aurora Value: ");
       Serial.println(auroraValue);
-
       Serial.println("Calling drawAurora...");
       drawAurora(auroraValue);  
   } else {
@@ -391,9 +372,8 @@ if (now.tm_hour >= 23) {    //   Begin deep sleeps at 23:00hrs wakes up when tim
 void drawAurora(float auroraValue) {
   char tempo[20];
   Serial.println("Drawing Aurora with Sprites...");
-  sprite.createSprite(120, 20);// 
-  sprite.fillSprite(WS_BLACK); 
-
+  sprite.createSprite(112, 20);  // 120,20
+  sprite.fillSprite(TFT_PURPLE); //WS_BLACK
         if (auroraValue >= 80) { 
           sprite.setTextColor(TFT_RED);
         }
@@ -410,11 +390,124 @@ void drawAurora(float auroraValue) {
   sprite.setCursor(0, 3);  
   sprintf(tempo, "PoAB: %2d%%", (int)auroraValue);  
   sprite.print(tempo);  
-  sprite.pushSprite(0, 220);  
+  sprite.pushSprite(0, 220);
+  //tft.drawRect(0, 220, 110, 25, TFT_PURPLE);
   delay(500); 
   sprite.deleteSprite();       
 }
 
+const int numStations = sizeof(aqicnURLs) / sizeof(aqicnURLs[0]);
+bool getaqiData(void *) {
+    Serial.println("Fetching AQI Data...");
+
+    if (WiFi.status() != WL_CONNECTED) {  
+        Serial.println("WiFi not connected, trying to reconnect...");
+        WiFi.disconnect();
+        WiFi.reconnect();
+        delay(900);  // not less than 500ms
+        if (WiFi.status() != WL_CONNECTED) {
+            Serial.println("Failed to reconnect.");
+            return true;  
+        }
+    }
+
+    for (int i = 0; i < numStations; i++) {  
+        HTTPClient http;
+        http.setTimeout(5000);  
+        http.begin(aqicnURLs[i]);  
+        int httpResponseCode = http.GET();
+        Serial.print("HTTP Response Code for Station ");
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.println(httpResponseCode);
+
+        if (httpResponseCode > 0) {
+      String payload = http.getString();
+      Serial.println("AQI Data: " + payload);
+      JsonDocument doc;
+      DeserializationError error = deserializeJson(doc, payload);
+      if (!error) {
+          int aqiValue = doc["data"]["aqi"];
+          // Get the timestamp of the actual AQI measurement
+        time_t aqiTime = doc["data"]["time"]["v"] | 0;
+        // Get current time from the RTC used by the weather display
+        time_t now = rtc.getEpoch();
+        // Determine whether the AQI reading is stale
+        if (aqiTime > 0 && now > 0) {
+    long age = now - aqiTime;
+    // Protect against an invalid/future timestamp
+    if (age < 0) {
+        age = 0;
+    }
+   // Determine AQI age status
+if (age > AQI_AGE_FOUR) {
+    aqiAgeStatus[i] = 3;       // S
+}
+else if (age > AQI_AGE_THREE) {
+    aqiAgeStatus[i] = 2;       // +
+}
+else if (age > AQI_AGE_TWO) {
+    aqiAgeStatus[i] = 1;       // *
+}
+else {
+    aqiAgeStatus[i] = 0;       // current
+}
+
+Serial.print("Station ");
+Serial.print(i);
+Serial.print(" AQI: ");
+Serial.println(aqiValue);
+
+Serial.print("Drawing station ");
+Serial.print(i);
+Serial.print(" AQI ");
+Serial.print(aqiValue);
+Serial.print(" age status = ");
+Serial.println(aqiAgeStatus[i]);
+
+drawAQI(aqiValue, i);
+
+if (aqiAgeStatus[i] == 3) {
+    Serial.println("STALE (S)");
+}
+else if (aqiAgeStatus[i] == 2) {
+    Serial.println("OLD (3)");
+}
+else if (aqiAgeStatus[i] == 1) {
+    Serial.println("OLD (2)");
+}
+else {
+    Serial.println("CURRENT");
+}
+
+} else {
+    aqiAgeStatus[i] = 3;
+    Serial.print("Station ");
+    Serial.print(i);
+    Serial.println(" has no valid timestamp - STALE");
+}
+      Serial.print("Station ");
+      Serial.print(i);
+      Serial.print(" AQI: ");
+      Serial.println(aqiValue);
+      drawAQI(aqiValue, i);  // Pass station index for positioning
+      } else {
+      aqiAgeStatus[i] = 3;
+      Serial.print("Failed to parse JSON for station ");
+      Serial.println(i);
+      }
+      } else {
+      aqiAgeStatus[i] = 3;
+      Serial.print("Error fetching data for station ");
+      Serial.println(i);
+      }
+              http.end();
+              delay(500);  // Small delay between requests
+          }
+          yield();
+          return true;  
+      }
+/*
 const int numStations = sizeof(aqicnURLs) / sizeof(aqicnURLs[2]);  // Number of stations ZERO if only one, ONE if two stations
 bool getaqiData(void *) {
     Serial.println("Fetching AQI Data...");
@@ -469,12 +562,12 @@ bool getaqiData(void *) {
     yield();
     return true;  
 }
+*/
 void drawAQI(int aqiValue, int stationIndex) {
-  char tempo[20];
+  char tempo[20];  //20
   Serial.println("Drawing AQI with Sprites...");
-  sprite.createSprite(220, 20); // 220,20
-  sprite.fillSprite(WS_BLACK);  // WS_BLACK
-
+  sprite.createSprite(220, 20);  // 220,20
+  sprite.fillSprite(TFT_NAVY); //sprite.fillSprite(WS_BLACK);
   if (aqiValue <= 15) {
       sprite.setTextColor(TFT_DARKGREEN);
   } else if (aqiValue <= 25) {
@@ -486,25 +579,43 @@ void drawAQI(int aqiValue, int stationIndex) {
   } else if (aqiValue <= 150) {
       sprite.setTextColor(TFT_ORANGE);
   } else if (aqiValue <= 200) {
-      sprite.setTextColor(TFT_RED); 
+      sprite.setTextColor(TFT_RED);
       sprite.fillSprite(TFT_YELLOW);
   } else if (aqiValue <= 300) {
       sprite.setTextColor(TFT_PURPLE);
       sprite.fillSprite(TFT_YELLOW);
   } else {
-      sprite.setTextColor(TFT_RED); 
+      sprite.setTextColor(TFT_RED);
       sprite.fillSprite(TFT_YELLOW);
   }
-  sprite.loadFont(arialround26); 
+  sprite.loadFont(arialround26);
   sprite.setTextDatum(BR_DATUM);
-  sprite.setCursor(0, 1);  // 15,3
-  sprintf(tempo,"%d",aqiValue); 
+  sprite.setCursor(2, 0); //0,1
+  // Show (*) with AQI if older than 2 hours
+  // Show (•) with AQI if older than 3 hours
+  // Show (s) without AQI if older than 4 hours
+  if (aqiAgeStatus[stationIndex] == 3) {
+    sprite.setTextColor(TFT_DARKGREY);
+    sprite.loadFont(arialround14);
+      sprintf(tempo, "stale");
+  }
+  else if (aqiAgeStatus[stationIndex] == 2) {
+      sprintf(tempo, "•%d", aqiValue);
+  }
+  else if (aqiAgeStatus[stationIndex] == 1) {
+      sprintf(tempo, "*%d", aqiValue);
+  }
+  else {
+      sprintf(tempo, "%d", aqiValue);
+  }
   sprite.print(tempo);
-  //int xPos = 140 + (stationIndex * 60);  // 201 Right side position Spacing: 41 pixels apart   //int xPos = 200 + (stationIndex * 40); 
-  int xPos = 172 + (stationIndex * 52);
-  sprite.pushSprite(xPos, 220); //220
-  delay(500); 
-  sprite.deleteSprite();  
+  //tft.drawRect(126, 220, 300, 26, TFT_WHITE);
+  // Put the sprite on the display
+  int xPos = 118 + (stationIndex * 52);  // sized for four stations - moved left 
+  //int xPos = 172 + (stationIndex * 52); // sized for three stations
+  sprite.pushSprite(xPos, 220); // 220
+  delay(500);
+  sprite.deleteSprite();
 }
 
   bool getOWMData(void *) { 
@@ -530,7 +641,6 @@ void drawAQI(int aqiValue, int stationIndex) {
   long tzOffset = 0;
   char lastUpdate[20]; // buffer for formatted time string
 
-  
   // get OWM Data
   http.begin(owmServerURL);
   httpResponseCode = http.GET();
@@ -560,7 +670,6 @@ void drawAQI(int aqiValue, int stationIndex) {
     owmGust = jsonDoc["wind"]["gust"];
     owmFeelTemp = jsonDoc["main"]["feels_like"];
     int owmWndDir = 0;
-
         if (jsonDoc["wind"]["deg"].is<int>()) {
           owmWndDir = jsonDoc["wind"]["deg"].as<int>();  // Extract wind direction in degrees
             }
@@ -570,10 +679,8 @@ void drawAQI(int aqiValue, int stationIndex) {
               time_t localTime = owmTime + tzOffset;
               struct tm *timeinfo = gmtime(&localTime);
               strftime(lastUpdate, sizeof(lastUpdate), "%H:%M", timeinfo); //strftime(lastUpdate, sizeof(lastUpdate), "%H:%M %d-%m", timeinfo);
-              
               Serial.print("Last Update: ");
               Serial.println(lastUpdate);
-
         if (owmIcon.endsWith("d")) {
           Serial.println("Day icon detected ☀️");
         } else if (owmIcon.endsWith("n")) {
@@ -581,14 +688,12 @@ void drawAQI(int aqiValue, int stationIndex) {
             }
         delay(500);        
     http.end();
-
     // display forecast  owmDesc
     drawOWMValue(owmIcon,owmCode,owmDesc,owmCond,owmTemp,owmHumi,owmWind,owmFeelTemp,owmGust,owmCldCvr,owmVisib,owmWndDir,lastUpdate);
       return true;
     }
       return true;
   }
-
 
 const char* getIconOWM(int owmCode, String owmIcon) {
   if (owmCode == 800 && owmIcon.endsWith("d")) { sprite.setTextColor(TFT_GOLD); return "N"; }  // Clear day/sun
@@ -622,14 +727,11 @@ const char* getWindDir(int degrees) { // Cardinal
   return "NW";                                       // Northwest
 }
 
-  /**/
   void drawOWMValue(String owmIcon,int owmCode,String owmDesc,String owmCond,float owmTemp,int owmHumi,float owmWind,float owmFeelTemp,float owmGust,int owmCldCvr,int owmVisib,float owmWndDir,const char *lastUpdate) {
   char tempo[64];
-
   Serial.println("Drawing Open Weather with Sprites...");
   sprite.createSprite(142, 70);
   sprite.fillSprite(WS_BLACK); //WS_BLACK
-
         //display Temp
         // Extract integer and decimal to allow for smaller decimal font
       int intPart = (int)owmTemp;
@@ -673,36 +775,30 @@ const char* getWindDir(int degrees) { // Cardinal
         else if (owmFeelTemp < -9.00) { 
             sprite.setTextColor(TFT_SKYBLUE);
         }
-        else if (owmFeelTemp < -1.00) { 
+        else if (owmFeelTemp < 0.00) { 
           sprite.setTextColor(TFT_WHITE);
         }
-        else if (owmFeelTemp < 10.00) { 
-          sprite.setTextColor(TFT_LIGHTGREY);
-        }
+        else if (owmFeelTemp > 0.00) { 
+          sprite.setTextColor(TFT_BLACK);
+        }/*
         else if (owmFeelTemp < 20.00) { 
         sprite.setTextColor(TFT_DARKGREY);
         }
         else if (owmFeelTemp >= 25.00) { 
         sprite.setTextColor(TFT_MAGENTA);
-        }
+        }*/
         else {
         sprite.setTextColor(TFT_DARKGREY);
         }
   //sprite.setTextDatum(CR_DATUM);
   //sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround20); 
-  sprintf(tempo,"%2.0f",owmFeelTemp);
+  sprintf(tempo,"%2.0f°",owmFeelTemp); ///////////<<<
   sprite.setTextDatum(CR_DATUM);
   sprite.drawString(tempo,136,35); //142,35
-  sprite.setTextColor(TFT_LIGHTGREY);
+  sprite.setTextColor(TFT_LIGHTGREY); // <<<<<<
   sprite.loadFont(arialround14);
   sprite.setTextDatum(CR_DATUM);
-  sprite.drawString("°", 142,31);
-
-  //sprite.setTextColor(TFT_WHITE);
-  //sprite.loadFont(arialround14); 
-  //sprintf(tempo,"%2d%%",owmHumi);
-  //sprite.drawString(tempo,130,47);
 
       if (owmWind * 3.6 > 64) {   
         sprite.setTextColor(TFT_RED);
@@ -769,19 +865,10 @@ const char* getWindDir(int degrees) { // Cardinal
   //sprintf(tempo,"%2.1f",owmVisib* 0.001);
   sprite.setTextDatum(CL_DATUM);
   sprite.drawString(tempo,2,64); //59,64
-
   sprite.loadFont(weatherfont60); 
   sprintf(tempo, "%s", getIconOWM(owmCode,owmIcon));
   sprite.setTextDatum(CL_DATUM);
   sprite.drawString(tempo,36,15);  //35,15
-/*
-  sprite.setTextColor(TFT_DARKGREY);
-  sprite.loadFont(arialround14); 
-  sprintf(tempo,"%d",owmCode); //just using this for debug weather code
-  sprite.setTextDatum(CL_DATUM);
-  sprite.drawString(tempo,2,6);
-*/
-
   sprite.setTextColor(TFT_WHITE);
   sprite.loadFont(arialround09); 
   sprite.drawString(String("") + lastUpdate, 2, 6); // time stamp of last OWM update, not the time of fetch
@@ -1021,7 +1108,6 @@ int sunriseHour, sunriseMin, sunsetHour, sunsetMin;
 sscanf(sunriseStr.c_str(), "%*d-%*d-%*dT%d:%d", &sunriseHour, &sunriseMin);
 sscanf(sunsetStr.c_str(), "%*d-%*d-%*dT%d:%d", &sunsetHour, &sunsetMin);
 
-
     // Convert daylight duration
     int daylightHours = daylightSeconds / 3600;
     int daylightMinutes = (daylightSeconds % 3600) / 60;
@@ -1127,9 +1213,10 @@ bool drawTime(void *) {
   sprite.loadFont(arialround20);
   sprite.drawString(tempo, 145, 35);
 
-  // ✅ DST display based on API info
+  // DST display based on API info
   if (isDSTActive) {
-    sprintf(tempo, "MDT"); // Daylight Time // MDT = Mountain Daylight Time - use your own time zone here (daylight time) ie: PDT, CDT, etc, or use DT
+    sprintf(tempo, "ABT");  //  new Aberta Time Zone
+    //sprintf(tempo, "MDT"); // Daylight Time // MDT = Mountain Daylight Time - use your own time zone here (daylight time) ie: PDT, CDT, etc, or use DT
   } else {
     sprintf(tempo, "MST"); // Standard Time // MST = Mountain Standard Time - use your own time zone here (standard time) ie: PST, CST, etc or use ST
   }
@@ -1137,7 +1224,6 @@ bool drawTime(void *) {
   sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround14);
   sprite.drawString(tempo, 146, 58);
-
   sprite.drawLine(177, 0, 177, 70, TFT_LIGHTGREY);
   sprite.pushSprite(0, 0);
   sprite.deleteSprite();
@@ -1185,11 +1271,6 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
         sprite.fillCircle (245, 11, 7, TFT_SILVER);  // Little full moon to show sun has set
         sprite.fillCircle (249, 11, 5, WS_BLACK); //251 // add this to make the moon crescent shape
       }  
-  //sprite.setTextColor(TFT_LIGHTGREY);
-  //sprite.loadFont(arialround14);
-  //sprintf(tempo,"[%d]", isDay); 
-  //sprite.setTextDatum(BL_DATUM);
-  //sprite.drawString(tempo,240,22);  
 
 // Shows time stamp of last update
   char timeBuffer[20];
@@ -1270,7 +1351,6 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
   sprite.setTextDatum(BL_DATUM);
   sprite.drawString(tempo, 140, 120); //130,120 | 140,110
 
-      
             if (feelTemp < -27.00) { 
                 sprite.setTextColor(TFT_RED);
             }
@@ -1283,32 +1363,32 @@ void drawMeteoForecast(int meteo, float currTemp, short currHumi, float minTemp,
             else if (feelTemp < -9.00) { 
                 sprite.setTextColor(TFT_SKYBLUE);
             }
-            else if (feelTemp < -1.00) { 
+            else if (feelTemp < 0.00) { 
               sprite.setTextColor(TFT_WHITE);
             }
-            else if (feelTemp < 10.00) { 
-              sprite.setTextColor(TFT_LIGHTGREY);
-            }
+            else if (feelTemp > 0.00) { 
+              sprite.setTextColor(TFT_BLACK);
+            }/*
             else if (feelTemp < 20.00) { 
             sprite.setTextColor(TFT_DARKGREY);
             }
             else if (feelTemp >= 25.00) { 
             sprite.setTextColor(TFT_MAGENTA);
-            }
+            }*/
             else {
                 sprite.setTextColor(TFT_DARKGREY);
             }
   sprite.loadFont(arialround26);
-  sprintf(tempo, "%3.0f", feelTemp);
+  sprintf(tempo, "%3.0f°", feelTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo, 262, 50); //<<
+  sprite.drawString(tempo, 268, 50); //<<  //sprite.drawString(tempo, 250, 50);
   //sprite.drawString(tempo, 172, 177); // 182,177
 
-  sprite.setTextColor(TFT_LIGHTGREY);
-  sprite.loadFont(arialround14);
-  sprintf(tempo,"°"); // separated this from lines above to make °C smaller font
-  sprite.setTextDatum(BL_DATUM);
-  sprite.drawString(tempo,263,39);
+  //sprite.setTextColor(TFT_LIGHTGREY);
+  //sprite.loadFont(arialround14);
+  //sprintf(tempo,"°"); // separated this from lines above to make °C smaller font
+  //sprite.setTextDatum(BL_DATUM);
+  //sprite.drawString(tempo,263,39);
   //sprite.drawString(tempo,173,157); // 183,157  168,35 full right - middle of digit 165,45
 
   sprite.setTextColor(TFT_LIGHTGREY);
@@ -1336,7 +1416,6 @@ sprite.drawString(tempo, 320, 90);
 //sprite.loadFont(arialround14); // added this to make 'kph' smaller font
 //sprintf(tempo,"kph");
 //sprite.drawString(tempo, 268, 110);
-
 
       if (gustWind > 69) {   // Check the higher threshold first
           sprite.setTextColor(TFT_RED);
@@ -1415,13 +1494,7 @@ sprite.loadFont(arialround20);
 sprintf(tempo,":Dir");  //sprintf(tempo,"Dir: %4.1f", wndDir);
 sprite.setTextDatum(BR_DATUM);
 sprite.drawString(tempo,320,130); // 170,130
-/*
-sprite.setTextColor(TFT_LIGHTGREY);
-sprite.loadFont(arialround20);  
-sprintf(tempo,"%4.0f°c:Dew", dewPo);
-sprite.setTextDatum(BR_DATUM);
-sprite.drawString(tempo,320,170);  
-*/
+
 sprite.setTextColor(TFT_LIGHTGREY);
 sprite.loadFont(arialround20);  
 sprintf(tempo,"Cld: %2d%%", cldTotal);
@@ -1553,26 +1626,28 @@ sprite.drawString(tempo,80,150);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2.0f°",minTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo,44,46); 
+  sprite.drawString(tempo,44,46); //53,46
 
+    if (maxTemp <= -15) {   // If min forecast temp is lower than or = -15 number is blue
+        sprite.setTextColor(TFT_SKYBLUE);
+    }
    if (maxTemp >= 27) {   // If max forecast temp is higher than or = 27 number is magenta
         sprite.setTextColor(TFT_MAGENTA);
-      }
+    }
     else {
         sprite.setTextColor(TFT_LIGHTGREY);
-      }
+    }
   //sprite.setTextColor(TFT_LIGHTGREY);
   sprite.loadFont(arialround20);  
   sprintf(tempo,"%2.0f°",maxTemp);
   sprite.setTextDatum(BR_DATUM);
-  sprite.drawString(tempo,316,46); 
-  sprite.drawRoundRect(0, 24, 48, 22, 5, TFT_SKYBLUE); // little box around daily low temp
-  sprite.drawRoundRect(272, 24, 48, 22, 5, TFT_MAGENTA); // little box around daily high temp
+  sprite.drawString(tempo,316,46); //316,46
+  sprite.drawRoundRect(0, 24, 48, 22, 5, TFT_SKYBLUE); // little box around daily low temp  //sprite.drawRoundRect(0, 24, 56, 22, 5, TFT_SKYBLUE);
+  sprite.drawRoundRect(272, 24, 48, 22, 5, TFT_MAGENTA); // little box around daily high temp  //sprite.drawRoundRect(263, 24, 56, 22, 5, TFT_MAGENTA);
   //drawRoundRect( left/right = x,  up/down = y, width, height, round, colour),
-  sprite.pushSprite(0,70);
+  sprite.pushSprite(0,70);//150,50
   sprite.deleteSprite();
 
 }
-/////////////////
 
 
